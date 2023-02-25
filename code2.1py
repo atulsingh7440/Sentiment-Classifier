@@ -13,3 +13,70 @@
 # The Y axis represents the Number of Retweets.
 
 # The data appear as expected.
+
+
+punctuation_chars = ["'", '"', ",", ".", "!", ":", ";", '#', '@']
+
+def strip_punctuation(word): #word is a string
+    for char in word:
+        if char in punctuation_chars:
+            word = word.replace(char, "")
+    return word
+
+
+# lists of words to use
+positive_words = []
+with open("positive_words.txt") as pos_f:
+    for lin in pos_f:
+        if lin[0] != ';' and lin[0] != '\n':
+            positive_words.append(lin.strip())
+
+
+negative_words = []
+with open("negative_words.txt") as pos_f:
+    for lin in pos_f:
+        if lin[0] != ';' and lin[0] != '\n':
+            negative_words.append(lin.strip())
+
+def get_neg(txt): #txt is string of one or more sentnces
+    txt = txt.lower() #Condition given in question
+    lst = txt.split() #list of words
+    count_of_neg_words = 0
+    for word in lst:
+        word = strip_punctuation(word)
+        if word in negative_words:
+            count_of_neg_words += 1
+    return count_of_neg_words
+
+def get_pos(txt): #txt is string of one or more sentnces
+    txt = txt.lower() #Condition given in question
+    lst = txt.split() #list of words
+    count_of_pos_words = 0
+    for word in lst:
+        word = strip_punctuation(word)
+        if word in positive_words:
+            count_of_pos_words += 1
+    return count_of_pos_words         #count of postive words present in txt string
+    
+
+    
+output_file = open("data.csv","w")
+output_file.write("Net Score, Number of Retweets")
+output_file.write('\n')
+    
+with open("project_twitter_data.csv", 'r') as connection_file:
+    lines = connection_file.readlines() #list of data of each line in .csv file
+    #print(lines)
+    #header = lines[0]
+    #field_names = header.strip().split(',')
+    #print(field_names)
+    for line in lines[1:]:
+        vals = line.strip().split(',') #list each line data
+        row_string = '{},{}'.format(get_pos(vals[0])-get_neg(vals[0]),vals[1])
+        output_file.write(row_string)
+        output_file.write('\n')
+
+output_file.close()
+
+# From the above code , we will get data.csv file that have data for scatterPlot
+# And from the help of this vedio link you can make scatter-plot : https://youtu.be/wu1mYRCIQcQ
